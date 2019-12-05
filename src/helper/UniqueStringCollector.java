@@ -8,7 +8,7 @@ public class UniqueStringCollector {
     public static UniqueStringCollector getUnique(String value)
     {
         for (UniqueStringCollector existingValue: collection) {
-            if (value.equals(existingValue.getValue())) {
+            if (value == existingValue.getValue()) {
                 return existingValue;
             }
         }

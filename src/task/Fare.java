@@ -3,11 +3,13 @@ package task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Fare implements Cloneable {
+public class Fare implements Cloneable, Comparable<Fare> {
     public List<Flight> flights;
     public Integer price;
     public String fid;
     public Integer flightSize;
+    public Integer pricePerFlight;
+    public boolean usedForCalculations = false;
 
     public List<Flight> getFlight() {
         return this.flights;
@@ -17,9 +19,7 @@ public class Fare implements Cloneable {
         this.flights = new ArrayList<>();
 
         for (data.object.Flight flight: routes) {
-            Flight taskFlight = new Flight();
-            taskFlight.from = flight.getFrom();
-            taskFlight.to = flight.getTo();
+            Flight taskFlight = FlightFactory.create(flight.getFrom(), flight.getTo());
             this.flights.add(taskFlight);
         }
     }
@@ -38,6 +38,23 @@ public class Fare implements Cloneable {
         }
 
         return flightSize;
+    }
+
+    public Integer getPricePerFlight() {
+        if (pricePerFlight == null) {
+            calculatePricePerFlight();
+        }
+        return pricePerFlight;
+    }
+
+    public void calculatePricePerFlight()
+    {
+        this.pricePerFlight = Math.round(this.getPrice() / this.getFlightSize());
+    }
+
+    @Override
+    public int compareTo(Fare fare) {
+        return this.getPricePerFlight() - fare.getPricePerFlight();
     }
 }
 

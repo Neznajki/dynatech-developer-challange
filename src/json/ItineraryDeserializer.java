@@ -2,10 +2,12 @@ package json;
 
 import com.google.gson.*;
 import task.Flight;
+import task.FlightFactory;
 import task.Itinerary;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItineraryDeserializer implements JsonDeserializer<Itinerary> {
     @Override
@@ -13,6 +15,12 @@ public class ItineraryDeserializer implements JsonDeserializer<Itinerary> {
         Gson gson = new Gson();
         Flight[] flights = gson.fromJson(jsonElement, Flight[].class);
 
-        return new Itinerary(Arrays.asList(flights));
+        List<Flight> flightList = new ArrayList<>();
+
+        for (Flight flight: flights) {
+            flightList.add(FlightFactory.create(flight));
+        }
+
+        return new Itinerary(flightList);
     }
 }

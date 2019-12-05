@@ -2,7 +2,8 @@ package task;
 
 import java.util.*;
 
-public class BestFareCollection {
+public class BestFareCollection extends AbstractFareCollector
+{
 
     private static BestFareCollection instance;
     public static BestFareCollection getInstance ()
@@ -35,34 +36,26 @@ public class BestFareCollection {
         return faresList.get(position);
     }
 
-    public void fareFound(data.object.Fare fare)
-    {
-        int itinerarySize = Itinerary.getSize();
+    @Override
+    protected Fare handleValidFare(Fare tempFare, int flightLength, int i) {
+        List<Fare> positionFares = this.faresList.get(i);
+        Fare currentFare = positionFares.get(flightLength);
 
-        int flightLength = fare.getRoutes().length;
-        if (flightLength > itinerarySize) {
-            return;
+        if (currentFare == null) {
+            positionFares.set(flightLength, tempFare);
+            return null;
         }
 
-        Fare tempFare = this.convertFare(fare);
-        flightLength--;
-
-        for (int i = 0; i < itinerarySize; i++) {
-            if (this.containsFlight(i, tempFare)) {
-                List<Fare> positionFares = this.faresList.get(i);
-                Fare currentFare = positionFares.get(flightLength);
-
-                if (currentFare == null) {
-                    positionFares.set(flightLength, tempFare);
-                    return;
-                }
-
-                if (currentFare.price > tempFare.price) {
-                    positionFares.set(flightLength, tempFare);
-                    tempFare = currentFare;
-                }
-            }
+        if (currentFare.price > tempFare.price) {
+            positionFares.set(flightLength, tempFare);
+            tempFare = currentFare;
         }
+        return tempFare;
+    }
+
+    @Override
+    protected boolean requiresDuplicates() {
+        return true;
     }
 
     public void removeNullsAndReverse()
@@ -71,36 +64,5 @@ public class BestFareCollection {
             fares.removeIf(Objects::isNull);
             Collections.reverse(fares);
         }
-    }
-
-    protected Fare convertFare(data.object.Fare fare)
-    {
-        Fare result = new Fare();
-
-        result.fid = fare.getFid();
-        result.price = fare.getPrice();
-        result.setFlights(fare.getRoutes());
-
-        return result;
-    }
-
-    protected boolean containsFlight(int i, Fare fare) {
-        Integer itinerarySize = Itinerary.getSize();
-
-        int recordsLeft = itinerarySize - i;
-        if (recordsLeft < fare.getFlightSize()) {
-            return false;
-        }
-
-        for (int k = 0; k < fare.getFlightSize(); k++) {
-            Flight ItineraryFlight = Itinerary.getInstance().getCollection().get(i + k);
-            Flight flightDataFlight = fare.getFlight().get(k);
-
-            if (!ItineraryFlight.equals(flightDataFlight)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

@@ -29,10 +29,7 @@ public class PriceGatherTask implements Runnable {
 			for (Fare fare: BestFareCollection.getInstance().getFaresByPosition(this.itineraryFlight.getPosition())) {
 				ItineraryFlight nextFlightData = null;
 				try {
-					nextFlightData = ItineraryFlight.getDeepSearchInstance(
-							this.itineraryFlight,
-							fare
-					);
+					nextFlightData = ItineraryFlight.getDeepSearchInstance(this.itineraryFlight,fare);
 				} catch (CloneNotSupportedException e) {
 					if (Debug.isDebug) {
 						e.printStackTrace();
