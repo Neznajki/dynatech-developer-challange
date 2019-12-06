@@ -54,9 +54,9 @@ public class Execute {
 
             System.out.println(allFareCollector.getCollection().size());
             Worker.addTask(new LowestPriceGatherTask(new LowestItineraryFlight(allFareCollector.getCollection().get(0))));
-//            workerSupervisor.markFareRequired();
-//            workerSupervisor.startWorking();
-//            workerSupervisor.waitUntilDone(PriceCollectionTerminator.taskTimeoutSecond);
+            workerSupervisor.markFareRequired();
+            workerSupervisor.startWorking();
+            workerSupervisor.waitUntilDone(PriceCollectionTerminator.taskTimeoutSecond);
 
             timer.showExecutionTime("price searching took");
             futureCleanup.cancel(true);

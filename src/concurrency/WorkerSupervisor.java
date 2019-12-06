@@ -16,7 +16,6 @@ public class WorkerSupervisor {
     private final List<Worker> workerList = new ArrayList<>();
     private ExecutorService threadPool;
     private Integer nThreads;
-    private boolean waitForTask;
     private boolean canTerminateWithoutFare = true;
     private boolean terminated = false;
     private boolean strictTaskWaitingFinish = false;
@@ -39,17 +38,10 @@ public class WorkerSupervisor {
         }
     }
 
-    public void startWorking(boolean strictTaskWaitingFinish)
-    {
-        this.strictTaskWaitingFinish = strictTaskWaitingFinish;
-        this.startWorking();
-    }
-
     public void startWorking()
     {
         this.threadPool = Executors.newFixedThreadPool(nThreads);
         this.createWorkers(this.nThreads);
-        this.waitForTask = true;
 
         try {
             for (Worker worker: this.workerList) {
@@ -64,7 +56,6 @@ public class WorkerSupervisor {
     {
         timeout -= Duration.between(this.began, LocalDateTime.now()).toSeconds();
         if (this.strictTaskWaitingFinish) {
-            this.waitForTask = false;
             this.strictTaskWaitingFinish = false;
         }
         try {
@@ -89,9 +80,7 @@ public class WorkerSupervisor {
 
     public boolean shouldStop()
     {
-        if (! this.waitForTask) {
-            this.checkActivity();
-        }
+        this.checkActivity();
 
         if (this.terminated) {
             if (this.canTerminateWithoutFare) {

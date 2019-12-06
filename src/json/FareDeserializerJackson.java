@@ -20,9 +20,7 @@ public class FareDeserializerJackson extends JsonDeserializer<Fare> {
 //            JsonNode node = oc.readTree(jsonParser);
 //
 //            node.get("routes").
-            data.object.Fare fare = mapper.readValue(jsonParser, data.object.Fare.class);
-
-            AllFareCollector.getInstance().fareFound(fare);
+            AllFareCollector.getInstance().fareFound(mapper.readValue(jsonParser, data.object.Fare.class));
         } catch (IOException e) {
             e.printStackTrace();
         }
