@@ -1,37 +1,30 @@
 package json;
 
-import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.gson.Gson;
-import helper.Debug;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import task.AllFareCollector;
 import task.Fare;
 
 import java.io.IOException;
 
-public class FareDeserializerJackson extends JsonDeserializer<Fare> {
-    protected static int counter = 0;
-    protected static long callCount = 0;
-    protected static Gson gson = new Gson();
 
+public class FareDeserializerJackson extends JsonDeserializer<Fare> {
+    protected static ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public Fare deserialize(com.fasterxml.jackson.core.JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-
-//        callCount++;
-//        counter++;
-//        if (counter == 10000) {
-//            counter = 0;
-//            if (Debug.isDebug) {System.out.println(callCount);}
-//        }
+    public Fare deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) {
         try {
-            data.object.Fare fare = gson.fromJson(jsonParser.readValueAsTree().toString(), data.object.Fare.class);
+//            ObjectCodec oc = jsonParser.getCodec();
+//            JsonNode node = oc.readTree(jsonParser);
+//
+//            node.get("routes").
+            data.object.Fare fare = mapper.readValue(jsonParser, data.object.Fare.class);
 
             AllFareCollector.getInstance().fareFound(fare);
-        } catch (Exception e) {
-            if (Debug.isDebug) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return null;

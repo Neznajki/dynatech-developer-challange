@@ -44,9 +44,7 @@ public class TaskExecutor {
 
     public static void executeConcurrency()
     {
-        ExecutorService threadPool = Executors.newFixedThreadPool(
-                10
-        );
+        ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
         for (PriceGatherTask task: priceGatherTasks) {
 				threadPool.execute(task);

@@ -3,6 +3,7 @@ module dynatech.challange {
 	exports helper;
 	exports task;
 	exports data.object;
+	exports concurrency;
 
 	requires com.google.gson;
 	requires com.fasterxml.jackson.databind;

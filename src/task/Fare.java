@@ -19,7 +19,7 @@ public class Fare implements Cloneable, Comparable<Fare> {
         this.flights = new ArrayList<>();
 
         for (data.object.Flight flight: routes) {
-            Flight taskFlight = FlightFactory.create(flight.getFrom(), flight.getTo());
+            Flight taskFlight = FlightFactory.createFlight(flight.getFrom(), flight.getTo());
             this.flights.add(taskFlight);
         }
     }

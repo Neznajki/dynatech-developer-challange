@@ -22,7 +22,7 @@ public class ItineraryDeserializerJackson extends JsonDeserializer<Itinerary> {
         List<Flight> flightList = new ArrayList<>();
 
         for (Flight flight: flights) {
-            flightList.add(FlightFactory.create(flight));
+            flightList.add(FlightFactory.createFlight(flight));
         }
 
         return new Itinerary(flightList);

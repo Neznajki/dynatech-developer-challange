@@ -5,12 +5,12 @@ import java.util.ArrayList;
 public class FlightFactory {
 	protected static ArrayList<Flight> flights = new ArrayList<>();
 
-	public static Flight create(Flight flight)
+	public static Flight createFlight(Flight flight)
     {
-        return create(flight.getFrom(), flight.getTo());
+        return createFlight(flight.getFrom(), flight.getTo());
     }
 
-	public static Flight create(String from, String to)
+	public static Flight createFlight(String from, String to)
 	{
         for (Flight flight: flights) {
             if (flight.getFrom().equals(from) && flight.getTo().equals(to)) {
@@ -26,4 +26,6 @@ public class FlightFactory {
 
         return newFlight;
     }
+
+//    public static ArrayList<Flight> flightCollection
 }

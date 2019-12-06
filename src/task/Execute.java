@@ -1,16 +1,17 @@
 package task;
 
+import concurrency.Worker;
+import concurrency.WorkerSupervisor;
 import helper.Debug;
 import helper.Timer;
+import json.FareDeserializerJackson;
+import json.FareDeserializerTask;
 import json.Reader;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class Execute {
     public static void main(String[] args) {
@@ -18,6 +19,12 @@ public class Execute {
 
         try {
             Timer timer = new Timer();
+            int nThreads = Runtime.getRuntime().availableProcessors() - 1;
+            if (nThreads <= 0) {
+                nThreads = 1;
+            }
+            WorkerSupervisor workerSupervisor = new WorkerSupervisor(nThreads);
+
             System.out.println(Runtime.getRuntime().availableProcessors());
 
             String dataFileName = System.getenv("DATA_FILE");
@@ -28,12 +35,13 @@ public class Execute {
 
             ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
             ScheduledFuture<?> futureFileStreamTerminator = executor.schedule(new PriceCollectionTerminator(), PriceCollectionTerminator.taskTimeoutSecond, TimeUnit.SECONDS);
-            ScheduledFuture<?> futureTerminator = executor.schedule(new TerminateTimeOut(), TerminateTimeOut.taskTimeoutSecond, TimeUnit.SECONDS);
             ScheduledFuture<?> futureCleanup = executor.scheduleAtFixedRate(new CleanupTask(), 0, CleanupTask.cleanupIntervalMillisecond, TimeUnit.MILLISECONDS);
-            ScheduledFuture<?> futureMemoryTerminator = executor.scheduleAtFixedRate(new TerminateMemoryCheck(), 0, TerminateMemoryCheck.taskTimeoutSecond, TimeUnit.SECONDS);
 
+//            workerSupervisor.startWorking(true);
 //            reader.getDataObjectGson(dataFileName);
             reader.getDataObjectJackson(dataFileName);
+
+//            workerSupervisor.waitUntilDone(4);
             timer.showExecutionTime("file parsing took");
             AllFareCollector allFareCollector = AllFareCollector.getInstance();
             allFareCollector.prepare();
@@ -41,24 +49,17 @@ public class Execute {
 //            BestFareCollection.getInstance().removeNullsAndReverse();
             Debug.debugTrace();
             System.gc();
-
             Debug.debugTrace();
 
-            LowestPriceGatherTask task = new LowestPriceGatherTask(
-                new LowestItineraryFlight(allFareCollector.getCollection().get(0))
-            );
 
-            task.run();
+            System.out.println(allFareCollector.getCollection().size());
+            Worker.addTask(new LowestPriceGatherTask(new LowestItineraryFlight(allFareCollector.getCollection().get(0))));
+//            workerSupervisor.markFareRequired();
+//            workerSupervisor.startWorking();
+//            workerSupervisor.waitUntilDone(PriceCollectionTerminator.taskTimeoutSecond);
 
-            while(LowestPriceGatherTask.nextFlightSearchTask != null) {
-                LowestPriceGatherTask.nextFlightSearchTask.run();
-            }
             timer.showExecutionTime("price searching took");
-//            executePriceGatherTask();
-//            futureCleanup.cancel(true);
-            futureTerminator.cancel(true);
             futureCleanup.cancel(true);
-            futureMemoryTerminator.cancel(true);
             futureFileStreamTerminator.cancel(true);
             executor.shutdown();
 //			TaskExecutor.executeConcurrency();//TODO make this
