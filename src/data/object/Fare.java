@@ -1,28 +1,16 @@
 package data.object;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.ArrayList;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Fare {
-    @SerializedName("routes")
-    public Flight[] routes;
-    @SerializedName("price")
+    public ArrayList<Flight> routes;
     public Integer price;
-    @SerializedName("fid")
-    public String fid;
+    public Integer fid;
 
-    public void setRoutes(Flight[] routes) {
-        this.routes = routes;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
-    public void setFid(String fid) {
-        this.fid = fid;
-    }
-
-    public Flight[] getRoutes() {
+    public ArrayList<Flight> getRoutes() {
         return routes;
     }
 
@@ -30,7 +18,7 @@ public class Fare {
         return price;
     }
 
-    public String getFid() {
+    public Integer getFid() {
         return fid;
     }
 }

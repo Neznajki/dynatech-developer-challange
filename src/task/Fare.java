@@ -6,7 +6,7 @@ import java.util.List;
 public class Fare implements Cloneable, Comparable<Fare> {
     public List<Flight> flights;
     public Integer price;
-    public String fid;
+    public Integer fid;
     public Integer flightSize;
     public Integer pricePerFlight;
     public boolean usedForCalculations = false;
@@ -15,7 +15,12 @@ public class Fare implements Cloneable, Comparable<Fare> {
         return this.flights;
     }
 
-    public void setFlights(data.object.Flight[] routes) {
+    public void setFlights(List<data.object.Flight> routes) {
+        if (BestFareCollection.priceSearchLength == 0) {
+            this.flights = FlightFactory.flightCollection(routes);
+            return;
+        }
+
         this.flights = new ArrayList<>();
 
         for (data.object.Flight flight: routes) {
@@ -28,7 +33,7 @@ public class Fare implements Cloneable, Comparable<Fare> {
         return price;
     }
 
-    public String getFid() {
+    public Integer getFid() {
         return fid;
     }
 

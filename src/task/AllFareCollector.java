@@ -25,6 +25,15 @@ public class AllFareCollector extends AbstractFareCollector {
     public List<Fare> getCollection() {
         return collection;
     }
+    public void setCollection(List<Fare> fares)
+    {
+        this.collection = fares;
+    }
+
+    @Override
+    protected boolean isFareSuitable(data.object.Fare fare) {
+        return true;
+    }
 
     @Override
     protected Fare handleValidFare(Fare tempFare, int flightLength, int i) {

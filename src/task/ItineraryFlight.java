@@ -131,7 +131,7 @@ public class ItineraryFlight implements Cloneable {
 
         int i = 0;
         for (Fare fare : this.fares) {
-            result[i] = fare.getFid();
+            result[i] = String.valueOf(fare.getFid());
             i++;
         }
 

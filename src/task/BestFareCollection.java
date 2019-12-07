@@ -4,7 +4,7 @@ import java.util.*;
 
 public class BestFareCollection extends AbstractFareCollector
 {
-
+    public static Integer priceSearchLength = 2;
     private static BestFareCollection instance;
     public static BestFareCollection getInstance ()
     {
@@ -15,12 +15,14 @@ public class BestFareCollection extends AbstractFareCollector
         return instance;
     }
 
+    private Integer minRequiredLength;
     protected List<List<Fare>> faresList;
 
     public BestFareCollection()
     {
         Integer itinerarySize = Itinerary.getSize();
         this.faresList = new ArrayList<>();
+        this.minRequiredLength = itinerarySize - priceSearchLength;
 
         for(int i=0; i < itinerarySize; i++) {
             ArrayList<Fare> fares = new ArrayList<>();
@@ -32,8 +34,52 @@ public class BestFareCollection extends AbstractFareCollector
         }
     }
 
+    public List<List<Fare>> getFaresList() {
+        return faresList;
+    }
+
     public List<Fare> getFaresByPosition(int position) {
         return faresList.get(position);
+    }
+
+    public void removeNullsAndReverse()
+    {
+        Iterator<List<Fare>> iterator = this.faresList.iterator();
+        while (iterator.hasNext()) {
+            List<Fare> fares = iterator.next();
+            fares.removeIf(Objects::isNull);
+
+            if (fares.size() == 0) {
+                iterator.remove();
+
+                continue;
+            }
+
+            Collections.reverse(fares);
+        }
+
+        System.out.println(String.format("done sorting %d", this.faresList.size()));
+    }
+
+    public List<Fare> getFaresCollection()
+    {
+        this.removeNullsAndReverse();
+        List<Fare> result = new ArrayList<>();
+
+        for (List<Fare> fares: this.faresList) {
+            result.addAll(fares);
+        }
+
+        return result;
+    }
+
+    @Override
+    protected boolean isFareSuitable(data.object.Fare fare) {
+        if (priceSearchLength == 0) {
+            return true;
+        }
+
+        return fare.routes.size() < priceSearchLength || fare.routes.size() > this.minRequiredLength;
     }
 
     @Override
@@ -56,13 +102,5 @@ public class BestFareCollection extends AbstractFareCollector
     @Override
     protected boolean requiresDuplicates() {
         return true;
-    }
-
-    public void removeNullsAndReverse()
-    {
-        for (List<Fare> fares: this.faresList) {
-            fares.removeIf(Objects::isNull);
-            Collections.reverse(fares);
-        }
     }
 }

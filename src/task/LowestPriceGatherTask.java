@@ -6,7 +6,7 @@ import helper.Debug;
 import java.util.List;
 
 public class LowestPriceGatherTask implements Runnable {
-    public static Integer fareCount = 100;
+    public static Integer fareCount = 3;
     public static Integer faresCalculated = 0;
     public static LowestItineraryFlight lowestItineraryFlight;
     private LowestItineraryFlight itineraryFlight;
@@ -25,7 +25,8 @@ public class LowestPriceGatherTask implements Runnable {
 
         try {
             List<Fare> fareCollection = AllFareCollector.getInstance().getCollection();
-            for (int i = 1; i < fareCollection.size(); i++) {
+            int size = fareCollection.size();
+            for (int i = 1; i < size; i++) {
                 Fare fare = fareCollection.get(i);
                 if (! this.itineraryFlight.addFare(fare)) {
                     if (! fare.usedForCalculations && fareCount >= faresCalculated) {

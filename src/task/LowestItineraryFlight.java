@@ -62,12 +62,23 @@ public class LowestItineraryFlight {
         return this.totalPrice;
     }
 
+    public int size()
+    {
+        int result = 0;
+
+        for (int i=0;i<this.fareCollection.size();i++) {
+            result += this.fareCollection.get(i).getFlightSize();
+        }
+
+        return result;
+    }
+
     public String[] getFreIds() {
         String[] result = new String[this.fareCollection.size()];
 
         int i = 0;
         for (Fare fare : this.fareCollection) {
-            result[i] = fare.getFid();
+            result[i] = String.valueOf(fare.getFid());
             i++;
         }
 
@@ -76,12 +87,14 @@ public class LowestItineraryFlight {
 
     private boolean canSuiteItinerary(Fare fare, int position)
     {
-        for (int i = 0; i < fare.getFlightSize(); i++) {
+        Integer flightSize = fare.getFlightSize();
+
+        for (int i = 0; i < flightSize; i++) {
             if (this.positions.get(position + i)) {
                 return false;
             }
-
-            Flight itineraryFlight = Itinerary.getInstance().getCollection().get(position + i);
+            List<Flight> itinerary = Itinerary.getInstance().getCollection();
+            Flight itineraryFlight = itinerary.get(position + i);
 
             if (itineraryFlight != fare.getFlight().get(i)) {
                 return false;
@@ -96,7 +109,8 @@ public class LowestItineraryFlight {
         fare.usedForCalculations = true;
         this.fareCollection.add(fare);
 
-        for (int i = 0; i < fare.getFlightSize(); i++) {
+        Integer flightSize = fare.getFlightSize();
+        for (int i = 0; i < flightSize; i++) {
             this.positions.set(position + i, true);
         }
     }

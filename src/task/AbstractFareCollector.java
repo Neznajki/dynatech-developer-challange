@@ -2,32 +2,45 @@ package task;
 
 abstract public class AbstractFareCollector {
 
-    public void fareFound(data.object.Fare fare)
+    public boolean fareFound(data.object.Fare fare)
     {
-        if (fare.routes.length == 0) {
-            return;
+        if (fare.routes.size() == 0) {
+            return true;
+        }
+
+        if (! this.isFareSuitable(fare)) {
+            return false;
         }
 
         int itinerarySize = Itinerary.getSize();
         Fare tempFare = this.convertFare(fare);
 
-        int flightLength = fare.getRoutes().length;
+        if (tempFare.flights == null) {
+            return true;
+        }
+
+        int flightLength = fare.getRoutes().size();
         if (flightLength > itinerarySize) {
-            return;
+            return true;
         }
 
         flightLength--;
-
+        boolean result = false;
         for (int i = 0; i < itinerarySize; i++) {
+
             if (this.containsFlight(i, tempFare)) {
+                result = true;
                 tempFare = handleValidFare(tempFare, flightLength, i);
                 if (! this.requiresDuplicates() || tempFare == null) {
-                    return;
+                    return true;
                 }
             }
         }
+
+        return result;
     }
 
+    protected abstract boolean isFareSuitable(data.object.Fare fare);
     protected abstract Fare handleValidFare(Fare tempFare, int flightLength, int i);
     protected abstract boolean requiresDuplicates();
 
