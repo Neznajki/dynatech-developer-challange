@@ -9,7 +9,6 @@ import json.Reader;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.*;
@@ -33,6 +32,7 @@ public class Execute {
 
 //            String dataFileName = System.getenv("DATA_FILE");
             String dataFileName = "/work/java/dynatech-challange/example-data_league-5-big-path.json";
+//            String dataFileName = "/work/java/dynatech-challange/example-data_league-5-50-percent-trash.json";
 //            String dataFileName = "/work/java/dynatech-challange/generated_100_500000.json";
 //            File file = new File(dataFileName);
 
@@ -70,9 +70,6 @@ public class Execute {
             }
 
             timer.showExecutionTime("price searching took");
-            futureCleanup.cancel(true);
-            futureFileStreamTerminator.cancel(true);
-            executor.shutdown();
 
             Debug.debugTrace();
             saveResultsToFile(reader, lowestFare);
@@ -82,6 +79,7 @@ public class Execute {
             FareDeserializerJackson.repeatRun = true;
             BestFareCollection.priceSearchLength = 0;
 
+            BestFareCollection.resetInstance();
             reader.collectObjectData(dataFileName);
 
             AllFareCollector allFareCollector = AllFareCollector.getInstance();
@@ -95,9 +93,13 @@ public class Execute {
             workerSupervisor.startWorking();
             workerSupervisor.waitUntilDone(59);
 
-            if (LowestPriceGatherTask.lowestItineraryFlight != null && LowestPriceGatherTask.lowestItineraryFlight.getTotalPrice() < lowestFare.getTotalPrice()) {
+            if (LowestPriceGatherTask.lowestItineraryFlight != null && LowestPriceGatherTask.lowestItineraryFlight.getTotalPrice() <= lowestFare.getTotalPrice()) {
                 saveResultsToFile(reader, LowestPriceGatherTask.lowestItineraryFlight);
             }
+
+            futureCleanup.cancel(true);
+            futureFileStreamTerminator.cancel(true);
+            executor.shutdown();
 
             System.exit(0);
         } catch (Exception e) {
@@ -107,10 +109,10 @@ public class Execute {
 
     }
 
-    private static void saveResultsToFile(Reader reader, LowestItineraryFlight lowestFare) throws IOException {
+    private static void saveResultsToFile(Reader reader, LowestItineraryFlight lowestFare) {
         String jsonFileContents = reader.convertObjectArrayToJsonString(lowestFare.getFreIds());
-
         System.out.println(jsonFileContents);
+        System.out.println(String.format("with total price %d", lowestFare.getTotalPrice()));
 
         writeToFile(jsonFileContents);
     }
@@ -174,7 +176,7 @@ public class Execute {
         return lowestFare;
     }
 
-    private static void writeToFile(String content) throws IOException {
+    private static void writeToFile(String content) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(System.getenv("RESULT_FILE")));
             writer.write(content);

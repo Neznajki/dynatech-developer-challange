@@ -6,6 +6,11 @@ public class BestFareCollection extends AbstractFareCollector
 {
     public static Integer priceSearchLength = 2;
     private static BestFareCollection instance;
+
+    public static void resetInstance () {
+        instance = null;
+    }
+
     public static BestFareCollection getInstance ()
     {
         if (instance == null) {

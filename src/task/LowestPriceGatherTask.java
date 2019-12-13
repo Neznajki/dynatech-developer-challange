@@ -13,7 +13,7 @@ public class LowestPriceGatherTask implements Runnable {
 
     public LowestPriceGatherTask(LowestItineraryFlight itineraryFlight) {
         this.itineraryFlight = itineraryFlight;
-        faresCalculated++;
+//        faresCalculated++;
     }
 
     @Override

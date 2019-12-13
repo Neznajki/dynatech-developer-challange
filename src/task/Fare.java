@@ -16,7 +16,7 @@ public class Fare implements Cloneable, Comparable<Fare> {
     }
 
     public void setFlights(List<data.object.Flight> routes) {
-        if (BestFareCollection.priceSearchLength == 0) {
+        if (BestFareCollection.priceSearchLength == 2) {
             this.flights = FlightFactory.flightCollection(routes);
             return;
         }
